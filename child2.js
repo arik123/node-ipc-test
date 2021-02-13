@@ -2,7 +2,7 @@ const ipc=require('node-ipc');
 
 /***************************************\
  * 
- * You should start both hello and world
+ * You should start both hello and gui
  * then you will see them communicating.
  * 
  * *************************************/
@@ -11,40 +11,40 @@ ipc.config.id = 'goodbye';
 ipc.config.retry= 15000;
 
 ipc.connectTo(
-    'world',
+    'gui',
     function(){
-        ipc.of.world.on(
+        ipc.of.gui.on(
             'connect',
             function(){
-                ipc.log('## connected to world ##', ipc.config.delay);
+                ipc.log('## connected to gui ##', ipc.config.delay);
             }
         );
-        ipc.of.world.on(
+        ipc.of.gui.on(
             'disconnect',
             function(){
-                ipc.log('disconnected from world');
+                ipc.log('disconnected from gui');
             }
         );
-        ipc.of.world.on(
+        ipc.of.gui.on(
             'WHOIS',
             function(){
-                ipc.of.world.emit(
+                ipc.of.gui.emit(
                     'IAM',
                     "bot2"
                 )
             }
         );
-        ipc.of.world.on(
+        ipc.of.gui.on(
             'kill.connection',
-            function(data){
-                ipc.log('world requested kill.connection');
-                ipc.disconnect('world');
+            function(){
+                ipc.log('gui requested kill.connection');
+                ipc.disconnect('gui');
             }
         );
-        ipc.of.world.on(
+        ipc.of.gui.on(
             'getPricelist',
             function(){
-                ipc.of.world.emit(
+                ipc.of.gui.emit(
                     'pricelist',
                     {a: 3, b:4}
                 )

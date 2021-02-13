@@ -7,35 +7,19 @@ const ipc=require('node-ipc');
  *
  * *************************************/
 
-ipc.config.id = 'world';
+ipc.config.id = 'gui';
 ipc.config.retry= 1500;
 
-var messages={
-    goodbye:false,
-    hello:false
-};
 let botSockets = {};
 
 ipc.serve(
     function(){
-		setInterval(()=>{
-		    console.log("broadcasting")
-            ipc.server.broadcast(
-                'WHOIS',
-                {}
-            );
-		}, 1000);
         setInterval(()=>{
             Object.keys(botSockets).forEach((a)=>{
-                if(botSockets[a].destroyed){
-                    botSockets[a] = undefined;
-                    return;
-                }
                 ipc.server.emit(
                     botSockets[a],
                     'getPricelist'
                 );
-
             });
         }, 1000);
 
@@ -43,17 +27,34 @@ ipc.serve(
             'IAM',
             (data, socket)=>{
                 if(!botSockets[data]){
+                    socket.id = data;
                     botSockets[data] = socket;
                 }
             }
         );
+
         ipc.server.on(
             'pricelist',
-            (data, socket)=>{
+            (data)=>{
                 console.log(JSON.stringify(data));
                 console.log(data.a)
             }
         );
+        ipc.server.on(
+            'connect',
+            (socket)=>{
+                ipc.server.emit(
+                    socket,
+                    'WHOIS'
+                );
+            }
+        );
+        ipc.server.on(
+            'socket.disconnected',
+            (socket)=>{
+                delete botSockets[socket.id];
+            }
+        )
     }
 );
 
